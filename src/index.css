@@ -1,21 +1,23 @@
+@import url("https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&display=swap");
 @import "tailwindcss";
 @import "leaflet/dist/leaflet.css";
 
 @theme inline {
-  --color-background: #000000;
+  --font-display: "Fraunces", Georgia, serif;
+  --color-background: #0f172a;
   --color-foreground: #ffffff;
-  --color-card: #0a0a0a;
+  --color-card: #131d35;
   --color-card-foreground: #ffffff;
   --color-primary: #00d9ff;
   --color-primary-foreground: #000000;
-  --color-secondary: #1a1a1a;
+  --color-secondary: #1b2742;
   --color-secondary-foreground: #ffffff;
   --color-accent: #0ea5e9;
   --color-accent-foreground: #ffffff;
-  --color-muted: #262626;
-  --color-muted-foreground: #a3a3a3;
-  --color-border: #262626;
-  --color-input: #262626;
+  --color-muted: #1b2742;
+  --color-muted-foreground: #94a3b8;
+  --color-border: #24314f;
+  --color-input: #24314f;
   --color-ring: #00d9ff;
   --color-glow-cyan: #00d9ff;
   --color-glow-blue: #0ea5e9;

@@ -1,242 +1,133 @@
-import { Link } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { 
-  Sparkles, 
-  DollarSign, 
-  FileCheck, 
-  TrendingUp,
-  ArrowRight,
-  CheckCircle2
-} from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { APP_URL } from '../App';
+
+// What the UniCounsel app really offers, one line each, in the order a student meets them.
+const TOOLS = [
+  { title: 'University matches', copy: 'Programmes ranked against your grades, budget and preferred countries.' },
+  { title: 'Cost calculator', copy: 'Tuition, rent and living costs added up for each city you are considering.' },
+  { title: 'Fee comparison', copy: 'Side-by-side fees for the universities on your shortlist.' },
+  { title: 'Scholarship finder', copy: 'Scholarships you can apply for, filtered by country and field.' },
+  { title: 'Visa checklist and odds', copy: 'The documents each visa needs and a rough read on your chances.' },
+  { title: 'Housing and city safety', copy: 'Places to stay near campus and what the area is like.' },
+  { title: 'Course to career', copy: 'Where a programme tends to lead, and what jobs pay in that market.' },
+  { title: 'Interview practice and resume', copy: 'Practise admission interviews and build a resume in the same place.' },
+];
+
+const STEPS = [
+  { art: '/illustrations/uc-how-profile.webp', title: 'Tell us about you', copy: 'Grades, budget, the countries you like and what you want to study.' },
+  { art: '/illustrations/uc-how-map.webp', title: 'See your matches', copy: 'A shortlist of programmes that fit, on a map and in a list.' },
+  { art: '/illustrations/uc-how-compare.webp', title: 'Compare the real cost', copy: 'Fees, living costs and scholarships, side by side.' },
+  { art: '/illustrations/uc-how-documents.webp', title: 'Get your papers ready', copy: 'Visa checklist, resume and interview practice before you apply.' },
+];
+
+// Counted from the university list that ships with the site, so the numbers are never made up.
+function useDatasetCounts() {
+  const [counts, setCounts] = useState<{ universities: number; countries: number } | null>(null);
+  useEffect(() => {
+    fetch('/unidata.csv')
+      .then((r) => r.text())
+      .then((text) => {
+        const rows = text.split(/\r?\n/).slice(1).filter(Boolean);
+        // The country is the last part of each address; addresses are messy, so only count names seen 3+ times.
+        const seen = new Map<string, number>();
+        rows.forEach((row) => {
+          const parts = row.split(',');
+          const c = parts[parts.length - 1].replace(/"/g, '').trim();
+          if (c && c.length < 40 && !/\d/.test(c)) seen.set(c, (seen.get(c) || 0) + 1);
+        });
+        const countries = [...seen.values()].filter((n) => n >= 3).length;
+        setCounts({ universities: rows.length, countries });
+      })
+      .catch(() => setCounts(null));
+  }, []);
+  return counts;
+}
 
 const LandingPage = () => {
+  const counts = useDatasetCounts();
+  const go = (path: string) => `${APP_URL}${path}`;
+
   return (
-    <div className="min-h-screen bg-background">
-      {/* Navigation Bar */}
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b border-border">
-        <div className="container mx-auto px-6 py-4">
-          <div className="flex items-center justify-between">
-            <Link to="/" className="text-heading-3 text-glow-cyan">
-              UniCounsel
-            </Link>
-            <div className="flex items-center gap-4">
-              <Button 
-                asChild
-                variant="outline"
-                className="border-border hover:border-glow-cyan/50"
-              >
-                <Link to="/login">Sign In</Link>
-              </Button>
-              <Button 
-                asChild
-                className="bg-glow-cyan text-background hover:bg-glow-cyan/90"
-              >
-                <Link to="/signup">Get Started</Link>
-              </Button>
-            </div>
-          </div>
+    <div className="min-h-screen bg-background text-foreground">
+      <header className="border-b border-border">
+        <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
+          <a href="/" className="flex items-center gap-2 text-lg font-semibold">
+            <img src="/favicon-32.png" alt="" width={24} height={24} /> UniCounsel
+          </a>
+          <nav className="flex items-center gap-6 text-sm">
+            <a href="#how" className="text-muted-foreground hover:text-foreground">How it works</a>
+            <a href="#tools" className="text-muted-foreground hover:text-foreground">Tools</a>
+            <a href={go('/login')} className="text-muted-foreground hover:text-foreground">Sign in</a>
+            <a href={go('/signup')} className="rounded-full bg-primary px-4 py-2 font-medium text-primary-foreground hover:opacity-90">Create account</a>
+          </nav>
         </div>
-      </nav>
+      </header>
 
-      {/* Hero Section */}
-      <section className="relative overflow-hidden py-20 lg:py-32 mt-16">
-        <div className="absolute inset-0 bg-gradient-to-br from-glow-cyan/10 via-background to-glow-blue/10" />
-        <div className="absolute top-0 left-1/4 w-96 h-96 bg-glow-cyan/20 rounded-full blur-3xl animate-pulse-glow" />
-        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-glow-blue/20 rounded-full blur-3xl animate-pulse-glow" />
-        
-        <div className="container mx-auto px-6 relative z-10">
-          <div className="max-w-4xl mx-auto text-center space-y-8">
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-glow-cyan/10 border border-glow-cyan/30 rounded-full">
-              <Sparkles className="h-4 w-4 text-glow-cyan" />
-              <span className="text-body-sm text-glow-cyan">AI-Powered Study Abroad Assistant</span>
-            </div>
-            
-            <h1 className="text-heading-1 text-glow-cyan glow-text-cyan">
-              Find Your Perfect University Program
-            </h1>
-            
-            <p className="text-body-lg text-muted-foreground max-w-2xl mx-auto">
-              Get personalized university and program recommendations based on your academic profile, 
-              budget, and career goals. Start your journey to studying abroad today with our AI assistant.
+      <main>
+        <section className="mx-auto grid max-w-6xl items-center gap-12 px-6 py-20 lg:grid-cols-[1fr_1.1fr]">
+          <div>
+            <h1 className="font-display text-5xl font-semibold leading-[1.05] sm:text-6xl">Choose where to study, with the numbers in front of you.</h1>
+            <p className="mt-6 max-w-xl text-lg leading-8 text-muted-foreground">
+              UniCounsel matches you with programmes abroad, adds up what they really cost, and walks you through the visa and
+              paperwork that follows.
             </p>
-            
-            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-              <Button 
-                asChild
-                size="lg"
-                className="bg-glow-cyan text-background hover:bg-glow-cyan/90 glow-cyan text-lg px-8 py-6"
-              >
-                <Link to="/signup">
-                  Get Started
-                  <ArrowRight className="ml-2 h-5 w-5" />
-                </Link>
-              </Button>
-              <Button 
-                asChild
-                variant="outline"
-                size="lg"
-                className="border-glow-cyan text-glow-cyan hover:bg-glow-cyan/10 text-lg px-8 py-6"
-              >
-                <Link to="/login">
-                  Sign In
-                </Link>
-              </Button>
+            <div className="mt-9 flex flex-wrap gap-3">
+              <a href={go('/signup')} className="rounded-full bg-primary px-6 py-3 text-sm font-medium text-primary-foreground hover:opacity-90">Find my matches</a>
+              <a href="#how" className="rounded-full border border-border px-6 py-3 text-sm font-medium hover:border-primary/60">How it works</a>
             </div>
+            {counts && (
+              <dl className="mt-10 flex gap-10">
+                <div><dt className="text-sm text-muted-foreground">Universities listed</dt><dd className="text-3xl font-semibold">{counts.universities.toLocaleString()}</dd></div>
+                <div><dt className="text-sm text-muted-foreground">Countries</dt><dd className="text-3xl font-semibold">{counts.countries.toLocaleString()}</dd></div>
+              </dl>
+            )}
           </div>
-        </div>
-      </section>
+          <img src="/illustrations/uc-hero.webp" alt="Campus buildings from several countries joined by a flight path" width={1200} height={675} className="h-auto w-full rounded-xl" />
+        </section>
 
-      {/* Features Section */}
-      <section className="py-20 bg-card/30">
-        <div className="container mx-auto px-6">
-          <div className="text-center mb-16">
-            <h2 className="text-heading-2 text-foreground mb-4">Why Choose UniCounsel?</h2>
-            <p className="text-body text-muted-foreground max-w-2xl mx-auto">
-              Comprehensive tools and AI-powered insights to make your study abroad journey seamless
-            </p>
+        <section id="how" className="border-t border-border">
+          <div className="mx-auto max-w-6xl px-6 py-20">
+            <h2 className="font-display text-3xl font-semibold sm:text-4xl">How it works</h2>
+            <ol className="mt-12 grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
+              {STEPS.map((s, i) => (
+                <li key={s.title}>
+                  <img src={s.art} alt="" width={300} height={300} loading="lazy" className="mb-6 h-36 w-auto object-contain" />
+                  <p className="text-xs font-medium text-primary">Step {i + 1}</p>
+                  <h3 className="mt-1 text-lg font-semibold">{s.title}</h3>
+                  <p className="mt-2 text-sm leading-6 text-muted-foreground">{s.copy}</p>
+                </li>
+              ))}
+            </ol>
           </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {[
-              {
-                icon: Sparkles,
-                title: 'Personalized Matches',
-                description: 'Get program recommendations tailored to your academic background and goals.',
-                color: 'text-glow-cyan'
-              },
-              {
-                icon: DollarSign,
-                title: 'Cost Analysis',
-                description: 'Understand the full cost of studying abroad, including tuition and living expenses.',
-                color: 'text-glow-blue'
-              },
-              {
-                icon: FileCheck,
-                title: 'Visa Guidance',
-                description: 'Learn about visa requirements and success rates for your chosen destination.',
-                color: 'text-glow-teal'
-              },
-              {
-                icon: TrendingUp,
-                title: 'Career Outcomes',
-                description: 'See employment rates and potential career paths after graduation.',
-                color: 'text-warning'
-              }
-            ].map((feature, index) => (
-              <Card 
-                key={index} 
-                className="bg-card border-border hover:border-glow-cyan/50 transition-all duration-300 hover:shadow-lg hover:shadow-glow-cyan/20"
-              >
-                <CardHeader>
-                  <div className="w-12 h-12 rounded-full bg-gradient-glow flex items-center justify-center mb-4">
-                    <feature.icon className="h-6 w-6 text-white" />
-                  </div>
-                  <CardTitle className="text-heading-4 text-foreground">
-                    {feature.title}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <CardDescription className="text-body-sm text-muted-foreground">
-                    {feature.description}
-                  </CardDescription>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </section>
+        </section>
 
-      {/* Stats Section */}
-      <section className="py-20">
-        <div className="container mx-auto px-6">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {[
-              { number: '10,000+', label: 'Students Helped' },
-              { number: '500+', label: 'Universities' },
-              { number: '50+', label: 'Countries' }
-            ].map((stat, index) => (
-              <div key={index} className="text-center">
-                <div className="text-5xl font-bold text-glow-cyan glow-text-cyan mb-2">
-                  {stat.number}
-                </div>
-                <div className="text-body text-muted-foreground">{stat.label}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Benefits Section */}
-      <section className="py-20 bg-card/30">
-        <div className="container mx-auto px-6">
-          <div className="max-w-3xl mx-auto">
-            <h2 className="text-heading-2 text-foreground text-center mb-12">
-              Everything You Need in One Place
-            </h2>
-            
-            <div className="space-y-4">
-              {[
-                'AI-powered university matching based on your profile',
-                'Real-time visa probability checker with success predictions',
-                'Comprehensive cost calculator and budget planner',
-                'Scholarship finder with auto-application features',
-                'Resume, SOP, and LOR generator',
-                '24/7 AI mentor for guidance and support',
-                'Interactive map showing nearby facilities and jobs',
-                'Document vault for secure storage'
-              ].map((benefit, index) => (
-                <div 
-                  key={index} 
-                  className="flex items-start gap-4 p-4 bg-card rounded-lg border border-border hover:border-glow-cyan/30 transition-all"
-                >
-                  <div className="flex-shrink-0 w-6 h-6 rounded-full bg-glow-cyan/10 flex items-center justify-center mt-0.5">
-                    <CheckCircle2 className="h-4 w-4 text-glow-cyan" />
-                  </div>
-                  <span className="text-body text-foreground">{benefit}</span>
+        <section id="tools" className="border-t border-border">
+          <div className="mx-auto max-w-6xl px-6 py-20">
+            <h2 className="font-display text-3xl font-semibold sm:text-4xl">What is inside</h2>
+            <div className="mt-10 grid border-t border-border sm:grid-cols-2">
+              {TOOLS.map((t) => (
+                <div key={t.title} className="border-b border-border py-6 pr-10">
+                  <h3 className="font-semibold">{t.title}</h3>
+                  <p className="mt-2 text-sm leading-6 text-muted-foreground">{t.copy}</p>
                 </div>
               ))}
             </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* CTA Section */}
-      <section className="py-20">
-        <div className="container mx-auto px-6">
-          <Card className="bg-gradient-glow border-glow-cyan/30 relative overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-br from-glow-cyan/20 via-transparent to-glow-blue/20" />
-            <CardContent className="relative z-10 p-12 text-center">
-              <h2 className="text-heading-2 text-white mb-4">
-                Ready to Find Your Perfect Program?
-              </h2>
-              <p className="text-body-lg text-white/90 mb-8 max-w-2xl mx-auto">
-                Join thousands of students who found their dream university with UniCounsel's AI-powered platform.
-              </p>
-              <Button 
-                asChild
-                size="lg"
-                className="bg-white text-glow-cyan hover:bg-white/90 text-lg px-8 py-6"
-              >
-                <Link to="/signup">
-                  Create Free Account
-                  <ArrowRight className="ml-2 h-5 w-5" />
-                </Link>
-              </Button>
-            </CardContent>
-          </Card>
-        </div>
-      </section>
-
-      {/* Footer */}
-      <footer className="py-12 border-t border-border">
-        <div className="container mx-auto px-6">
-          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-            <div className="text-heading-3 text-glow-cyan">UniCounsel</div>
-            <div className="text-body-sm text-muted-foreground">
-              © 2024 UniCounsel. All rights reserved.
-            </div>
+        <section className="border-t border-border">
+          <div className="mx-auto max-w-6xl px-6 py-20 text-center">
+            <h2 className="font-display text-3xl font-semibold sm:text-4xl">Start with your shortlist.</h2>
+            <p className="mx-auto mt-4 max-w-lg text-muted-foreground">It takes a few minutes to set up your profile. You can change it any time.</p>
+            <a href={go('/signup')} className="mt-8 inline-flex rounded-full bg-primary px-7 py-3 text-sm font-medium text-primary-foreground hover:opacity-90">Create your account</a>
           </div>
+        </section>
+      </main>
+
+      <footer className="border-t border-border">
+        <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-4 px-6 py-8 text-sm text-muted-foreground">
+          <span>UniCounsel</span>
+          <span>Fees and visa rules change; always confirm with the university and embassy.</span>
         </div>
       </footer>
     </div>
