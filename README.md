@@ -4,14 +4,14 @@ UniCounsel एक comprehensive platform है जो students को अपन
 
 ## Features
 
-- 🎓 **University Matching**: Student profile के based पर personalized university recommendations
-- 🌍 **Global Database**: 9000+ universities worldwide
-- 🔍 **Advanced Search**: Country, city, और field based filtering
-- 💰 **Cost Calculator**: Tuition और living costs का estimation
-- 📊 **Match Scoring**: Academic, financial, language, और visa fit analysis
-- 🗺️ **Map Explorer**: Interactive map पर universities देखें
-- 📝 **Document Generator**: Application documents generate करें
-- 🎯 **Scholarship Finder**: Available scholarships search करें
+- **University Matching**: Student profile के based पर personalized university recommendations
+- **Global Database**: 9000+ universities worldwide
+- **Advanced Search**: Country, city, और field based filtering
+- **Cost Calculator**: Tuition और living costs का estimation
+- **Match Scoring**: Academic, financial, language, और visa fit analysis
+- **Map Explorer**: Interactive map पर universities देखें
+- **Document Generator**: Application documents generate करें
+- **Scholarship Finder**: Available scholarships search करें
 
 ## Tech Stack
 
