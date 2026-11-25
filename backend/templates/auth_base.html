@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}UniCounsel{% endblock %}</title>
+  <meta name="theme-color" content="#0f172a">
+  <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" sizes="any">
+  <link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', filename='favicon-32.png') }}">
+  <link rel="apple-touch-icon" href="{{ url_for('static', filename='apple-touch-icon.png') }}">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Literata:opsz,wght@7..72,500;7..72,600&family=Manrope:wght@400;500;600;700&display=swap">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/auth.css') }}">
+  <script>document.documentElement.classList.add('js')</script>
+</head>
+<body>
+  <main class="auth">
+    <section class="auth-form">
+      <a class="brand" href="{{ url_for('landing') }}">UniCounsel</a>
+      <div class="panel">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% for category, message in messages %}
+            <div class="alert alert-{{ category }}" role="alert">{{ message }}</div>
+          {% endfor %}
+        {% endwith %}
+        {% block form %}{% endblock %}
+      </div>
+    </section>
+
+    <aside class="auth-stage" aria-label="What UniCounsel does">
+      <p class="stage-top">Study abroad, planned with real numbers</p>
+      <div class="slides">
+        {% block slides %}{% endblock %}
+      </div>
+      <div>
+        <p class="caption" aria-live="polite"></p>
+        <div class="dots" role="group" aria-label="Choose an illustration">
+          {% for _ in range(slide_count|default(4)) %}<button type="button" aria-label="Show illustration {{ loop.index }}"></button>{% endfor %}
+        </div>
+      </div>
+    </aside>
+  </main>
+  <script src="{{ url_for('static', filename='js/auth.js') }}" defer></script>
+</body>
+</html>
