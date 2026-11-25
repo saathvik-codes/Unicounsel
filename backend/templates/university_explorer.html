@@ -1,0 +1,82 @@
+{% extends "dashboard_updated.html" %}
+
+{% block title %}University Explorer - UniCounsel{% endblock %}
+
+{% block dashboard_content %}
+<div class="p-6 max-w-6xl">
+    <h1 class="text-3xl font-semibold mb-1">University Explorer</h1>
+    <p class="text-text-muted mb-6">Universities worldwide, loaded live from OpenAlex. Pick a country or search by name.</p>
+
+    <form id="uni-form" class="flex flex-wrap gap-3 mb-6">
+        <select id="uni-country" class="px-3 py-2 rounded-lg bg-card border border-border min-w-[14rem]">
+            <option value="">All countries</option>
+        </select>
+        <input id="uni-q" type="search" placeholder="Search by name, e.g. Oxford" class="px-3 py-2 rounded-lg bg-card border border-border flex-1 min-w-[14rem]">
+        <select id="uni-sort" class="px-3 py-2 rounded-lg bg-card border border-border">
+            <option value="research">Most cited first</option>
+            <option value="name">Name A to Z</option>
+        </select>
+        <button class="px-5 py-2 rounded-lg bg-primary text-black font-medium" type="submit">Search</button>
+    </form>
+
+    <p id="uni-count" class="text-sm text-text-muted mb-3" aria-live="polite"></p>
+    <div id="uni-list" class="grid gap-3 md:grid-cols-2"></div>
+    <div class="flex items-center justify-between mt-6">
+        <button id="uni-prev" class="px-4 py-2 rounded-lg border border-border disabled:opacity-40" disabled>Previous</button>
+        <span id="uni-page" class="text-sm text-text-muted"></span>
+        <button id="uni-next" class="px-4 py-2 rounded-lg border border-border disabled:opacity-40" disabled>Next</button>
+    </div>
+    <p class="text-xs text-text-muted mt-6">Citation counts come from OpenAlex and describe research output, not teaching quality. Fees and visa rules are in the other tools.</p>
+</div>
+
+<script>
+(function () {
+    const PER = 20;
+    let page = 1;
+    const $ = (id) => document.getElementById(id);
+    const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'}[c]));
+
+    const INIT = {{ init|tojson }};
+    $('uni-country').insertAdjacentHTML('beforeend', INIT.countries.map((c) => `<option value="${esc(c.code)}">${esc(c.name)} (${c.universities.toLocaleString()})</option>`).join(''));
+
+    function card(u) {
+        const place = [u.city, u.country].filter(Boolean).join(', ');
+        const map = u.lat != null ? `https://www.openstreetmap.org/?mlat=${u.lat}&mlon=${u.lon}#map=12/${u.lat}/${u.lon}` : '';
+        return `<article class="card p-4">
+            <h3 class="font-semibold">${esc(u.name)}</h3>
+            <p class="text-sm text-text-muted">${esc(place) || 'Location not listed'}</p>
+            ${u.price_level != null ? `<p class="text-sm mt-2">Everyday costs: ${u.price_level} <span class="text-text-muted">(US = 100)</span></p>` : ''}
+            <p class="text-sm mt-1">${u.papers != null ? u.papers.toLocaleString() + ' papers, ' : ''}${u.citations != null ? u.citations.toLocaleString() + ' citations' : ''}</p>
+            <p class="mt-3 text-sm flex gap-4">
+                ${u.website ? `<a class="text-primary hover:underline" href="${esc(u.website)}" target="_blank" rel="noopener">Website</a>` : ''}
+                ${map ? `<a class="text-primary hover:underline" href="${map}" target="_blank" rel="noopener">Map</a>` : ''}
+            </p></article>`;
+    }
+
+    function show(d) {
+        $('uni-list').innerHTML = d.results.length ? d.results.map(card).join('') : '<p class="text-text-muted">No universities match this search.</p>';
+        const pages = Math.min(500, Math.max(1, Math.ceil(d.total / PER)));
+        $('uni-count').textContent = d.total.toLocaleString() + ' universities';
+        $('uni-page').textContent = 'Page ' + d.page + ' of ' + pages;
+        $('uni-prev').disabled = d.page <= 1;
+        $('uni-next').disabled = d.page >= pages;
+    }
+
+    async function load() {
+        const qs = new URLSearchParams({country: $('uni-country').value, q: $('uni-q').value, sort: $('uni-sort').value, page, per_page: PER});
+        try {
+            const d = await (await fetch('/api/universities?' + qs)).json();
+            show(d);
+        } catch (e) {
+            $('uni-list').innerHTML = '<p class="text-text-muted">Could not load universities. Please try again in a moment.</p>';
+        }
+    }
+
+    $('uni-form').addEventListener('submit', (e) => { e.preventDefault(); page = 1; load(); });
+    $('uni-country').addEventListener('change', () => { page = 1; load(); });
+    $('uni-prev').addEventListener('click', () => { page--; load(); });
+    $('uni-next').addEventListener('click', () => { page++; load(); });
+    show(INIT.first);   // already in the page: no request, no spinner
+})();
+</script>
+{% endblock %}
