@@ -41,7 +41,7 @@ const LandingPage = () => {
       <header className="border-b border-border">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
           <a href="/" className="flex items-center gap-2 text-lg font-semibold">
-            <img src="/favicon-32.png" alt="" width={24} height={24} /> UniCounsel
+            <img src="/apple-touch-icon.png" alt="" width={32} height={32} className="rounded-lg" /> UniCounsel
           </a>
           <nav className="flex items-center gap-6 text-sm">
             <a href="#how" className="text-muted-foreground hover:text-foreground">How it works</a>
@@ -53,9 +53,9 @@ const LandingPage = () => {
       </header>
 
       <main>
-        <section className="mx-auto grid max-w-6xl items-center gap-12 px-6 py-20 lg:grid-cols-[1fr_1.1fr]">
+        <section className="mx-auto grid max-w-6xl items-center gap-8 px-6 py-12 lg:grid-cols-[1.25fr_1fr] lg:gap-12 lg:py-16">
           <div>
-            <h1 className="font-display text-5xl font-semibold leading-[1.05] sm:text-6xl">Choose where to study, with the numbers in front of you.</h1>
+            <h1 className="font-display text-4xl font-semibold leading-[1.1] sm:text-5xl lg:text-[3rem]">Choose where to study, with the numbers in front of you.</h1>
             <p className="mt-6 max-w-xl text-lg leading-8 text-muted-foreground">
               UniCounsel matches you with programmes abroad, adds up what they really cost, and walks you through the visa and
               paperwork that follows.
@@ -65,19 +65,21 @@ const LandingPage = () => {
               <a href="#how" className="rounded-full border border-border px-6 py-3 text-sm font-medium hover:border-primary/60">How it works</a>
             </div>
             {counts && counts.universities > 0 && (
-              <dl className="mt-10 flex gap-10">
+              <dl className="mt-8 flex gap-10 border-t border-border pt-6">
                 <div><dt className="text-sm text-muted-foreground">Universities listed</dt><dd className="text-3xl font-semibold">{counts.universities.toLocaleString()}</dd></div>
                 <div><dt className="text-sm text-muted-foreground">Countries</dt><dd className="text-3xl font-semibold">{counts.countries.toLocaleString()}</dd></div>
               </dl>
             )}
           </div>
-          <img src="/illustrations/uc-hero.webp" alt="Campus buildings from several countries joined by a flight path" width={1200} height={675} className="h-auto w-full rounded-xl" />
+          <div className="aspect-[4/3] w-full overflow-hidden rounded-2xl border border-border bg-card">
+            <img src="/illustrations/uc-hero.webp" alt="Campus buildings from several countries joined by a flight path" width={1200} height={675} className="h-full w-full scale-[1.12] object-cover object-[50%_85%]" />
+          </div>
         </section>
 
         <section id="how" className="border-t border-border">
-          <div className="mx-auto max-w-6xl px-6 py-20">
+          <div className="mx-auto max-w-6xl px-6 py-14">
             <h2 className="font-display text-3xl font-semibold sm:text-4xl">How it works</h2>
-            <ol className="mt-12 grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
+            <ol className="mt-10 grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
               {STEPS.map((s, i) => (
                 <li key={s.title}>
                   <img src={s.art} alt="" width={300} height={300} loading="lazy" className="mb-6 h-36 w-auto object-contain" />
@@ -91,7 +93,7 @@ const LandingPage = () => {
         </section>
 
         <section id="tools" className="border-t border-border">
-          <div className="mx-auto max-w-6xl px-6 py-20">
+          <div className="mx-auto max-w-6xl px-6 py-14">
             <h2 className="font-display text-3xl font-semibold sm:text-4xl">What is inside</h2>
             <div className="mt-10 grid border-t border-border sm:grid-cols-2">
               {TOOLS.map((t) => (
@@ -105,7 +107,7 @@ const LandingPage = () => {
         </section>
 
         <section className="border-t border-border">
-          <div className="mx-auto max-w-6xl px-6 py-20 text-center">
+          <div className="mx-auto max-w-6xl px-6 py-14 text-center">
             <h2 className="font-display text-3xl font-semibold sm:text-4xl">Start with your shortlist.</h2>
             <p className="mx-auto mt-4 max-w-lg text-muted-foreground">It takes a few minutes to set up your profile. You can change it any time.</p>
             <a href={go('/signup')} className="mt-8 inline-flex rounded-full bg-primary px-7 py-3 text-sm font-medium text-primary-foreground hover:opacity-90">Create your account</a>
